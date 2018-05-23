@@ -1,0 +1,7 @@
+target/
+.idea
+*.iml
+*.lck
+*.log
+*.script
+main.properties
