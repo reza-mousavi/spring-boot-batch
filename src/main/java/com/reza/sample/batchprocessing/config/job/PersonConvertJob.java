@@ -1,6 +1,7 @@
 package com.reza.sample.batchprocessing.config.job;
 
 import com.reza.sample.batchprocessing.batch.PersonItemProcessor;
+import com.reza.sample.batchprocessing.batch.PersonItemWriter;
 import com.reza.sample.batchprocessing.model.Person;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -8,9 +9,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -18,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-
-import javax.sql.DataSource;
 
 @Configuration
 public class PersonConvertJob {
@@ -51,12 +48,8 @@ public class PersonConvertJob {
 
 	@Bean
 	@StepScope
-	public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
-		return new JdbcBatchItemWriterBuilder<Person>()
-				.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-				.sql("INSERT INTO PERSON (name, family) VALUES (:name, :family)")
-				.dataSource(dataSource)
-				.build();
+	public ItemWriter<Person> writer() {
+		return new PersonItemWriter();
 	}
 
 	@Bean
@@ -69,12 +62,12 @@ public class PersonConvertJob {
 	}
 
 	@Bean
-	public Step step1(JdbcBatchItemWriter<Person> writer) {
+	public Step step1() {
 		return stepBuilderFactory.get("step1")
 				.<Person, Person> chunk(10)
 				.reader(reader())
 				.processor(processor())
-				.writer(writer)
+				.writer(writer())
 				.build();
 	}
 
