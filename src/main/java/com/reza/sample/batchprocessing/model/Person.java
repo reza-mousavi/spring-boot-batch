@@ -14,10 +14,4 @@ public class Person {
 	private String name;
 	private String family;
 
-	public static Person transform(Person person) {
-		return Person.builder()
-				.name(person.getName().toUpperCase())
-				.family(person.getFamily().toUpperCase())
-				.build();
-	}
 }

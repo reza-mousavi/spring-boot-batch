@@ -6,6 +6,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -29,6 +30,7 @@ public class PersonConvertJob {
 	public StepBuilderFactory stepBuilderFactory;
 
 	@Bean
+	@StepScope
 	public FlatFileItemReader<Person> reader() {
 		return new FlatFileItemReaderBuilder<Person>()
 				.name("personItemReader")
@@ -42,11 +44,13 @@ public class PersonConvertJob {
 	}
 
 	@Bean
+	@StepScope
 	public PersonItemProcessor processor() {
 		return new PersonItemProcessor();
 	}
 
 	@Bean
+	@StepScope
 	public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
 		return new JdbcBatchItemWriterBuilder<Person>()
 				.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
